@@ -1,75 +1,44 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Presentación Automática de Imágenes</title>
-  <style>
-        * {
-        margin: 0 auto;
-        padding: 0;
-        box-sizing: border-box;
+<script>
+  const FOLDER_ID = '18CzOefCL-ZgPzwbcQx9Ldo116z6JuzfN';
+  const API_KEY = 'AIzaSyAj4uz8zML6DlVo9wFK3yVkBw4YQwAKmO8';
+
+  let images = [];
+  let current = 0;
+
+  async function fetchImages() {
+    const url = `https://www.googleapis.com/drive/v3/files?q='${FOLDER_ID}'+in+parents+and+mimeType contains 'image/' and trashed=false&fields=files(id)&key=${API_KEY}`;
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+      if (data.files && data.files.length > 0) {
+        const newImages = data.files.map(f => `https://lh3.googleusercontent.com/d/${f.id}=w1000`);
+        // Actualizamos solo si hay cambios
+        if (newImages.length !== images.length) {
+          images = newImages;
         }
-
-        html, body {
-        width: 100%;
-        height: 100%;
-        background: #000;
-        overflow: hidden;
-        }
-
-                img {
-                width: 100vw;
-                height: 100vh;
-                object-fit: contain;
-                display: block;
-                background: #000; /* fondo detrás de la imagen si hay bordes */
-                }   
-                
-  </style>
-</head>
-<body>
-  <img id="slideshow" src="" alt="Cargando...">
-  <script>
-    const FOLDER_ID = '18CzOefCL-ZgPzwbcQx9Ldo116z6JuzfN';
-    const API_KEY = 'AIzaSyAj4uz8zML6DlVo9wFK3yVkBw4YQwAKmO8';
-
-    let images = [];
-    let current = 0;
-
-    async function fetchImages() {
-      const url = `https://www.googleapis.com/drive/v3/files?q='${FOLDER_ID}'+in+parents+and+mimeType contains 'image/' and trashed=false&fields=files(id)&key=${API_KEY}`;
-      try {
-        const res = await fetch(url);
-        const data = await res.json();
-        if (data.files && data.files.length > 0) {
-          images = data.files.map(f => `https://lh3.googleusercontent.com/d/${f.id}=w1000`);
-        } else {
-          document.getElementById('slideshow').alt = "No hay imágenes disponibles";
-        }
-      } catch (e) {
-        console.error('Error al obtener imágenes:', e);
-        document.getElementById('slideshow').alt = "Error al conectar con Drive";
       }
+    } catch (e) {
+      console.error('Error al obtener imágenes:', e);
     }
+  }
 
-    function showImage() {
-      if (images.length === 0) return;
-      const img = document.getElementById('slideshow');
-      img.src = images[current];
-      img.alt = `Imagen ${current + 1}`;
-      img.onerror = () => img.alt = "Imagen no disponible";
-      current = (current + 1) % images.length;
-    }
+  function showImage() {
+    if (images.length === 0) return;
+    const img = document.getElementById('slideshow');
+    img.src = images[current];
+    img.alt = `Imagen ${current + 1}`;
+    img.onerror = () => img.alt = "Imagen no disponible";
+    current = (current + 1) % images.length;
+  }
 
-    async function startSlideshow() {
-      await fetchImages();
-      if (images.length === 0) return;
-      showImage();
-      setInterval(showImage, 10000);
-    }
+  async function startSlideshow() {
+    await fetchImages();
+    if (images.length === 0) return;
+    showImage();
+    setInterval(showImage, 10000);       // Cambia de imagen cada 10 segundos
+    setInterval(fetchImages, 15000);     // Actualiza la lista cada 30 segundos
+  }
 
-    startSlideshow();
-  </script>
-</body>
+  startSlideshow();
+</script>
 
-</html>
