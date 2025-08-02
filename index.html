@@ -11,14 +11,13 @@
       const res = await fetch(url);
       const data = await res.json();
       if (data.files && data.files.length > 0) {
-        const newImages = data.files.map(f => `https://lh3.googleusercontent.com/d/${f.id}=w1000`);
-        // Actualizamos solo si hay cambios
-        if (newImages.length !== images.length) {
-          images = newImages;
-        }
+        images = data.files.map(f => `https://lh3.googleusercontent.com/d/${f.id}=w1000`);
+      } else {
+        document.getElementById('slideshow').alt = "No hay imágenes disponibles";
       }
     } catch (e) {
       console.error('Error al obtener imágenes:', e);
+      document.getElementById('slideshow').alt = "Error al conectar con Drive";
     }
   }
 
@@ -35,10 +34,9 @@
     await fetchImages();
     if (images.length === 0) return;
     showImage();
-    setInterval(showImage, 10000);       // Cambia de imagen cada 10 segundos
-    setInterval(fetchImages, 15000);     // Actualiza la lista cada 30 segundos
+    setInterval(showImage, 5000);       // Cambio de imagen cada 5 segundos
+    setTimeout(() => location.reload(), 15000); // Recarga completa cada 15 segundos
   }
 
   startSlideshow();
 </script>
-
