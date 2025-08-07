@@ -20,20 +20,27 @@
       }
     }
 
-    function showImage() {
-      if (images.length === 0) return;
-      const img = document.getElementById('slideshow');
-      // Fade out
-      img.style.opacity = 0;
-      setTimeout(() => {
-        img.src = images[current];
-        img.alt = `Imagen ${current + 1}`;
-        img.onerror = () => img.alt = "Imagen no disponible";
-        // Fade in
-        img.style.opacity = 1;
-        current = (current + 1) % images.length;
-      }, 500); // 500ms coincide con el transition de CSS
-    }
+function showImage() {
+  if (images.length === 0) return;
+  const img = document.getElementById('slideshow');
+  img.style.opacity = 0; // Fade out
+
+  // Pre-carga la nueva imagen en un objeto temporal
+  const tempImg = new window.Image();
+  tempImg.src = images[current];
+  tempImg.alt = `Imagen ${current + 1}`;
+  tempImg.onerror = () => tempImg.alt = "Imagen no disponible";
+
+  tempImg.onload = () => {
+    // Cuando la nueva imagen esté lista, cámbiala y haz fade in
+    img.src = tempImg.src;
+    img.alt = tempImg.alt;
+    setTimeout(() => {
+      img.style.opacity = 1; // Fade in
+      current = (current + 1) % images.length;
+    }, 50); // Pequeño delay para asegurar el cambio de src antes del fade in
+  };
+}
 
     async function startSlideshow() {
       await fetchImages();
