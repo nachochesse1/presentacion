@@ -46,9 +46,10 @@ function showImage() {
       await fetchImages();
       if (images.length === 0) return;
       showImage();
-      setInterval(showImage, 4000); // Cambia de imagen cada 3 segundos
+      setInterval(showImage, 8000); // Cambia de imagen cada 3 segundos
       setInterval(fetchImages, 30000); // Refresca las imágenes cada 30 segundos
         
     }
+
 
     startSlideshow();
